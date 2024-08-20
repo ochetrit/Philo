@@ -42,6 +42,11 @@
 # define LEN_THRD 33
 # define ERR_THRD2 "Error: failed to join a thread\n"
 # define LEN_THRD2 31
+# define TAKE_FORK "%d %d has taken a fork\n"
+# define IS_EATING "%d %d is eating\n"
+# define IS_SLEEPING "%d %d is sleeping\n"
+# define IS_THINKING "%d %d is thinking\n"
+# define IS_DEAD "%d %d died\n"
 # define EATING 0
 # define THINKING 1
 # define SLEEPING 2
@@ -62,9 +67,8 @@ typedef struct s_philo
 	int id;
 	int nb_eat;
 	int is_doing;
-	suseconds_t time_of_the_creation;
 	suseconds_t last_meal;
-	suseconds_t is_dead;
+	int is_dead;
 	struct s_philo *next;
 	t_data *data;
 	pthread_t thread;
@@ -75,7 +79,7 @@ typedef struct s_philo
 t_philo	**parse_args(int ac, char **av);
 t_philo	**init_philo(t_data *data);
 void	free_philo(t_philo **philo);
-int		pair_philo(t_philo **philo);
+int		make_thread(t_philo **philo);
 
 /// UTILS ///
 long int    get_time(void);

@@ -43,10 +43,9 @@ t_philo *ft_lstnew(t_data *data, int id)
         return (NULL);
     newlist->id = id;
     newlist->data = data;
-    newlist->time_of_the_creation = get_time();
-    newlist->last_meal = 0;
+    newlist->last_meal = get_time();
     newlist->is_doing = THINKING;
-    newlist->is_dead = 0;
+    newlist->is_dead = false;
     newlist->next = NULL;
     newlist->thread = 0;
     newlist->nb_eat = 0;
