@@ -21,4 +21,14 @@ long int    get_time(void)
     return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
- 
+void	timer(int time_to_act)
+{
+	int	timer;
+
+	timer = 0;
+	while (timer < time_to_act * 1000)
+	{
+		usleep(150);
+		timer += 150;
+	}
+}

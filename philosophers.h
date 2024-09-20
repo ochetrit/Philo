@@ -42,11 +42,11 @@
 # define LEN_THRD 33
 # define ERR_THRD2 "Error: failed to join a thread\n"
 # define LEN_THRD2 31
-# define TAKE_FORK "%d %d has taken a fork\n"
-# define IS_EATING "%d %d is eating\n"
-# define IS_SLEEPING "%d %d is sleeping\n"
-# define IS_THINKING "%d %d is thinking\n"
-# define IS_DEAD "%d %d died\n"
+# define TAKE_FORK "%ld %d has taken a fork\n"
+# define IS_EATING "%ld %d is eating\n"
+# define IS_SLEEPING "%ld %d is sleeping\n"
+# define IS_THINKING "%ld %d is thinking\n"
+# define IS_DEAD "%ld %d died\n"
 # define EATING 0
 # define THINKING 1
 # define SLEEPING 2
@@ -58,8 +58,12 @@ typedef struct s_data
 	suseconds_t		time_to_die;
 	suseconds_t		time_to_eat;
 	suseconds_t		time_to_sleep;
-	pthread_mutex_t	death_mutex;
-	int				is_dead;
+	pthread_t		monitor;
+	pthread_mutex_t	print_msg;
+	pthread_mutex_t	read_stop_philo;
+	int				stop_philo;
+	int				*philo_full;
+	void			*philo;
 }	t_data;
 
 typedef struct s_philo
@@ -67,11 +71,14 @@ typedef struct s_philo
 	int id;
 	int nb_eat;
 	int is_doing;
+	suseconds_t time_born;
 	suseconds_t last_meal;
 	int is_dead;
 	struct s_philo *next;
 	t_data *data;
 	pthread_t thread;
+	pthread_mutex_t read_last_meal;
+	pthread_mutex_t read_nb_meal;
 	pthread_mutex_t *left_fork;
 	pthread_mutex_t right_fork;
 }	t_philo;
@@ -80,8 +87,13 @@ t_philo	**parse_args(int ac, char **av);
 t_philo	**init_philo(t_data *data);
 void	free_philo(t_philo **philo);
 int		make_thread(t_philo **philo);
+void	*routine_monitor(void *arg);
+int		init_data(t_data *data, int ac, char **av);
+int is_number(char *str);
+void	*routine_monitor(void *arg);
 
 /// UTILS ///
 long int    get_time(void);
+void	timer(int time_to_act);
 
 #endif

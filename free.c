@@ -20,7 +20,9 @@ void    free_philo(t_philo **philo)
     if (!philo)
         return ;
     current = *philo;
-    pthread_mutex_destroy(&current->data->death_mutex);
+    pthread_mutex_destroy(&current->data->read_stop_philo);
+	pthread_mutex_destroy(&current->data->print_msg);
+	free(current->data->philo_full);
     free(current->data);
     while (current)
     {

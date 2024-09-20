@@ -44,6 +44,7 @@ t_philo *ft_lstnew(t_data *data, int id)
     newlist->id = id;
     newlist->data = data;
     newlist->last_meal = get_time();
+	newlist->time_born = newlist->last_meal;
     newlist->is_doing = THINKING;
     newlist->is_dead = false;
     newlist->next = NULL;
@@ -59,15 +60,21 @@ int init_mutex(t_philo **philo, t_philo *current)
     {
         if (pthread_mutex_init(&current->right_fork, NULL) == -1)
             return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
+		if (pthread_mutex_init(&current->read_last_meal, NULL) == -1)
+            return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
+		if (pthread_mutex_init(&current->read_nb_meal, NULL) == -1)
+            return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
         current->next->left_fork = &current->right_fork;
         current = current->next;
     }
     if (pthread_mutex_init(&current->right_fork, NULL) == -1)
         return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
     philo[0]->left_fork = &current->right_fork;
-    if (pthread_mutex_init(&philo[0]->data->death_mutex, NULL) == -1)
+    if (pthread_mutex_init(&philo[0]->data->read_stop_philo, NULL) == -1)
+		return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
+	if (pthread_mutex_init(&philo[0]->data->print_msg, NULL) == -1)
             return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
-    return (true);
+	return (true);
 }
 
 t_philo **init_philo(t_data *data)
@@ -88,7 +95,8 @@ t_philo **init_philo(t_data *data)
             return (free_philo(philo), NULL);
         ft_lstadd_back(philo, tmp);
     }
-    if (!init_mutex(philo, *philo))
-        return(free_philo(philo), NULL);
+	if (!init_mutex(philo, *philo))
+		return(free_philo(philo), NULL);
+	data->philo = philo;
     return (philo);
 }

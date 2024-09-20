@@ -19,11 +19,11 @@ int main(int ac, char **av)
     philo = parse_args(ac, av);
     if (!philo)
         return (free_philo(philo), 1);
-    if (philo[0]->data->nb_must_eat == 0)
+    else if (philo[0]->data->nb_must_eat == 0)
         return (free_philo(philo), 2);
-    if (philo[0]->data->nb_philo > 200)
+    else if (philo[0]->data->nb_philo > 200)
         return (free_philo(philo), 3);
-	if (!make_thread(philo))
+	else if (!make_thread(philo))
 		return (free_philo(philo), 4);
     free_philo(philo);
     return (0);

@@ -16,16 +16,16 @@ int is_int(char *str, int len)
 {
     int i;
 
+	i = 0;
     if (str[0] == '+')
     {
         str++;
         len--;
     }
     if (len < LEN_INT_MAX)
-        return (true);
+		return (true);
     if (len == LEN_INT_MAX)
     {
-        i = 0;
         while (str[i] - "2147483647"[i] <= 0 && str[i])
 			i++;
     }
@@ -79,32 +79,6 @@ int is_number(char *str)
     return (ft_atoi(str));
 }
 
-int init_data(t_data *data, int ac, char **av)
-{
-    data->nb_philo = is_number(av[1]);
-    if (data->nb_philo == -1)
-        return (false);
-    data->time_to_die = is_number(av[2]);
-    if (data->time_to_die == -1)
-        return (false);
-    data->time_to_eat = is_number(av[3]);
-    if (data->time_to_eat == -1)
-        return (false);
-    data->time_to_sleep = is_number(av[4]);
-    if (data->time_to_sleep == -1)
-        return (false);
-    data->is_dead = false;
-    if (ac == 6)
-    {
-        data->nb_must_eat = is_number(av[5]);
-        if (data->nb_must_eat == -1)
-            return (false);
-    }
-    else
-        data->nb_must_eat = -1;
-    return (true);
-}
-
 t_philo **parse_args(int ac, char **av)
 {
     t_data *data;
@@ -121,5 +95,6 @@ t_philo **parse_args(int ac, char **av)
     if (data->nb_philo < 2)
         return (write(STDERR, ERR_NB_PHILO, LEN_NB_PHILO), free(data), NULL);
     philo = init_philo(data);
+	data->philo = (void *)philo;
     return (philo);
 }
