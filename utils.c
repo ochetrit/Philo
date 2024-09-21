@@ -23,12 +23,9 @@ long int    get_time(void)
 
 void	timer(int time_to_act)
 {
-	int	timer;
-
-	timer = 0;
-	while (timer < time_to_act * 1000)
-	{
-		usleep(150);
-		timer += 150;
-	}
+	long int start;
+	
+	start = get_time();
+	while (get_time() - start < time_to_act)
+		usleep(100);
 }

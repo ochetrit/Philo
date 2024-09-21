@@ -17,10 +17,8 @@ int	check_death(t_philo *philo, t_data *data)
 	int return_value;
 
 	return_value = false;
-	write(STDERR, "TEST\n", 5);
-	fprintf(stderr, "ID : %d\n", philo->id);
+	free(philo);
 	pthread_mutex_lock(&philo->read_last_meal);
-	write(STDERR, "TEST2\n", 6);
 	if (philo->last_meal > data->time_to_die)
 		return_value = true;
 	pthread_mutex_unlock(&philo->read_last_meal);
@@ -71,15 +69,15 @@ void	*routine_monitor(void *arg)
 {
 	t_data	*data;
 	t_philo	*lst;
+	t_philo	**philo;
 
 	data = (t_data *)arg;
 	while (1)
 	{
-		lst = (t_philo *)data->philo;
-		
+		philo = (t_philo **)data->philo;
+		lst = *philo;
 		while (lst)
 		{
-			fprintf(stderr, "time born : %ld\n", lst->time_born);
 			check_philo(lst, data);
 			pthread_mutex_lock(&data->read_stop_philo);
 			if (data->stop_philo)

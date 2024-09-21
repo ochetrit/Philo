@@ -43,8 +43,8 @@ t_philo *ft_lstnew(t_data *data, int id)
         return (NULL);
     newlist->id = id;
     newlist->data = data;
-    newlist->last_meal = get_time();
-	newlist->time_born = newlist->last_meal;
+	newlist->time_born = get_time();
+    newlist->last_meal = newlist->time_born;
     newlist->is_doing = THINKING;
     newlist->is_dead = false;
     newlist->next = NULL;
@@ -97,6 +97,6 @@ t_philo **init_philo(t_data *data)
     }
 	if (!init_mutex(philo, *philo))
 		return(free_philo(philo), NULL);
-	data->philo = philo;
+	data->philo = (void *)philo;
     return (philo);
 }
