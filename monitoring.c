@@ -6,7 +6,7 @@
 /*   By: ochetrit <ochetrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 14:31:06 by ochetrit          #+#    #+#             */
-/*   Updated: 2024/09/17 16:04:51 by ochetrit         ###   ########.fr       */
+/*   Updated: 2024/09/22 22:34:39 by ochetrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,22 @@ int	check_death(t_philo *philo, t_data *data)
 	int return_value;
 
 	return_value = false;
-	free(philo);
+	pthread_mutex_lock(&philo->read_is_eating);
+	if (philo->is_eating)
+	{
+		pthread_mutex_unlock(&philo->read_is_eating);
+		return (return_value);
+	}
+	pthread_mutex_unlock(&philo->read_is_eating);
 	pthread_mutex_lock(&philo->read_last_meal);
-	if (philo->last_meal > data->time_to_die)
+	if (get_time() - philo->last_meal > data->time_to_die)
+	{
+		print_message(philo, IS_DEAD);
+		pthread_mutex_lock(&data->print_msg);
+		data->can_print = false;
+		pthread_mutex_unlock(&data->print_msg);
 		return_value = true;
+	}
 	pthread_mutex_unlock(&philo->read_last_meal);
 	return (return_value);
 }
@@ -31,7 +43,7 @@ int	finish_eating(t_philo *philo, t_data *data)
 
 	return_value = false;
 	pthread_mutex_lock(&philo->read_nb_meal);
-	if (philo->nb_eat == data->nb_must_eat)
+	if (philo->nb_eat >= data->nb_must_eat)
 		return_value = true;
 	pthread_mutex_unlock(&philo->read_nb_meal);
 	return (return_value);
@@ -52,7 +64,7 @@ void	check_philo(t_philo *philo, t_data *data)
 	if (check_death(philo, data))
 		set_stop_philo(data);
 	else if (data->nb_must_eat != -1 && finish_eating(philo, data))
-		data->philo_full[philo->id] = true;
+		data->philo_full[philo->id - 1] = true;
 	i = 0;
 	everyone_full = true;
 	while (i < data->nb_philo && data->nb_must_eat != -1)
@@ -61,7 +73,7 @@ void	check_philo(t_philo *philo, t_data *data)
 			everyone_full = false;
 		i++;
 	}
-	if (everyone_full)
+	if (everyone_full && data->nb_must_eat != -1)
 		set_stop_philo(data);
 }
 
@@ -72,6 +84,7 @@ void	*routine_monitor(void *arg)
 	t_philo	**philo;
 
 	data = (t_data *)arg;
+	int i = 0;
 	while (1)
 	{
 		philo = (t_philo **)data->philo;
@@ -85,6 +98,7 @@ void	*routine_monitor(void *arg)
 				pthread_mutex_unlock(&data->read_stop_philo);
 				return (NULL);
 			}
+			i++;
 			pthread_mutex_unlock(&data->read_stop_philo);
 			lst = lst->next;
 		}

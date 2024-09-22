@@ -28,8 +28,10 @@ void    free_philo(t_philo **philo)
     {
         tmp = current;
         current = current->next;
-        if (tmp->left_fork)
-            pthread_mutex_destroy(tmp->left_fork);
+		pthread_mutex_destroy(&tmp->right_fork);
+		pthread_mutex_destroy(&tmp->read_last_meal);
+		pthread_mutex_destroy(&tmp->read_nb_meal);
+		pthread_mutex_destroy(&tmp->read_is_eating);
         free(tmp);
     }
     free(philo);

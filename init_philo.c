@@ -45,8 +45,7 @@ t_philo *ft_lstnew(t_data *data, int id)
     newlist->data = data;
 	newlist->time_born = get_time();
     newlist->last_meal = newlist->time_born;
-    newlist->is_doing = THINKING;
-    newlist->is_dead = false;
+    newlist->is_eating = false;
     newlist->next = NULL;
     newlist->thread = 0;
     newlist->nb_eat = 0;
@@ -54,9 +53,12 @@ t_philo *ft_lstnew(t_data *data, int id)
     return (newlist);
 }
 
-int init_mutex(t_philo **philo, t_philo *current)
+int init_mutex(t_philo **philo)
 {
-    while (current->next)
+	t_philo	*current;
+
+	current = *philo;
+    while (current)
     {
         if (pthread_mutex_init(&current->right_fork, NULL) == -1)
             return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
@@ -64,12 +66,14 @@ int init_mutex(t_philo **philo, t_philo *current)
             return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
 		if (pthread_mutex_init(&current->read_nb_meal, NULL) == -1)
             return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
-        current->next->left_fork = &current->right_fork;
-        current = current->next;
+		if (pthread_mutex_init(&current->read_is_eating, NULL) == -1)
+            return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
+		if (current->next)
+			current->next->left_fork = &current->right_fork;
+		else
+    		philo[0]->left_fork = &current->right_fork;
+		current = current->next;
     }
-    if (pthread_mutex_init(&current->right_fork, NULL) == -1)
-        return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
-    philo[0]->left_fork = &current->right_fork;
     if (pthread_mutex_init(&philo[0]->data->read_stop_philo, NULL) == -1)
 		return (write(STDERR, ERR_MUTEX, LEN_MUTEX), false);
 	if (pthread_mutex_init(&philo[0]->data->print_msg, NULL) == -1)
@@ -95,7 +99,7 @@ t_philo **init_philo(t_data *data)
             return (free_philo(philo), NULL);
         ft_lstadd_back(philo, tmp);
     }
-	if (!init_mutex(philo, *philo))
+	if (!init_mutex(philo))
 		return(free_philo(philo), NULL);
 	data->philo = (void *)philo;
     return (philo);

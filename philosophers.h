@@ -47,9 +47,6 @@
 # define IS_SLEEPING "%ld %d is sleeping\n"
 # define IS_THINKING "%ld %d is thinking\n"
 # define IS_DEAD "%ld %d died\n"
-# define EATING 0
-# define THINKING 1
-# define SLEEPING 2
 
 typedef struct s_data
 {
@@ -62,6 +59,7 @@ typedef struct s_data
 	pthread_mutex_t	print_msg;
 	pthread_mutex_t	read_stop_philo;
 	int				stop_philo;
+	int				can_print;
 	int				*philo_full;
 	void			*philo;
 }	t_data;
@@ -70,13 +68,13 @@ typedef struct s_philo
 {
 	int id;
 	int nb_eat;
-	int is_doing;
+	int is_eating;
 	suseconds_t time_born;
 	suseconds_t last_meal;
-	int is_dead;
 	struct s_philo *next;
 	t_data *data;
 	pthread_t thread;
+	pthread_mutex_t read_is_eating;
 	pthread_mutex_t read_last_meal;
 	pthread_mutex_t read_nb_meal;
 	pthread_mutex_t *left_fork;
@@ -91,6 +89,7 @@ void	*routine_monitor(void *arg);
 int		init_data(t_data *data, int ac, char **av);
 int is_number(char *str);
 void	*routine_monitor(void *arg);
+void	print_message(t_philo *philo, char *msg);
 
 /// UTILS ///
 long int    get_time(void);

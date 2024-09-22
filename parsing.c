@@ -96,5 +96,6 @@ t_philo **parse_args(int ac, char **av)
         return (write(STDERR, ERR_NB_PHILO, LEN_NB_PHILO), free(data), NULL);
     philo = init_philo(data);
 	data->philo = (void *)philo;
+	data->can_print = true;
     return (philo);
 }
